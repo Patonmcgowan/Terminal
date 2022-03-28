@@ -1,0 +1,148 @@
+/*
+  terminal.css
+
+  ------------------------------------------------------------------------------
+  Revision History
+  ================
+  10 Feb 2020 MDS Downloaded from https://github.com/Apthox/Javascript-Terminal
+  11 Feb 2020 MDS Changed terminal colour, added revision history and 
+                  beautifying
+  ------------------------------------------------------------------------------
+ */
+
+
+body {
+  background-color: grey;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#screen {
+  background-color: black;
+  position: absolute;
+  height: calc(100% - 20px);
+  width: 100%;
+  overflow-y: scroll;
+  border: 2px grey;
+}
+
+#Container,
+#Container>div {
+  -moz-transform: rotateX(180deg);
+  -ms-transform: rotateX(180deg);
+  -o-transform: rotate(180deg);
+  -webkit-transform: rotateX(180deg);
+  transform: rotateX(180deg);
+}
+
+#wrapper {
+  display: table-cell;
+  vertical-align: bottom;
+  height: 100%;
+}
+
+.log {
+  color: #00C000;
+  background-color: black;
+  font-family: 'Source Code Pro', monospace;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.log p {
+  margin: 0;
+  padding: 0;
+}
+
+#input {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#input p {
+  background-color: black;
+  color: #00C000;
+  display: inline-block;
+  font-family: 'Source Code Pro', monospace;
+  padding-right: .4em;
+  margin: 0;
+}
+
+#input input {
+  width: 80%;
+  display: inline-block;
+}
+
+a {
+  background-color: black;
+  color: #00C000;
+  font-family: 'Source Code Pro', monospace;
+}
+
+input[type="command"] {
+  background-color: black;
+  border: 0;
+  color: #00C000;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 16px;
+  outline: 0;
+}
+
+#statusBarContainer {
+  position: fixed;
+  left: 0; 
+  bottom: 0;
+  height: 20px;
+  background: grey; 
+  width: 100%; 
+  text-align: center;
+}
+#statusBarLeft {
+  float: left; 
+  width: 30% ; 
+  text-align: left;
+  font-size: 12px;
+  margin: 3px;
+  padding-left: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  border-radius: 4px;
+} 
+#statusBarCentre {
+  width: calc(40% - 25px);
+  text-align: center;
+  font-size: 12px;
+  margin-top: 0px;
+  margin-left: auto; margin-right: auto;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  border-radius: 4px;
+}
+#statusBarRight {
+  float: right;
+  width: 30%; 
+  text-align: right;
+  font-size: 12px;
+  margin: 3px;
+  padding-right: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  border-radius: 4px;
+}
+
+/*
+// ----------------------------------------------------------------------------
+//                               End of file
+// ----------------------------------------------------------------------------
+*/
+
+

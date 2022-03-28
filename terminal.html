@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!-- 
+  terminal.html
+
+  A client side based terminal 
+
+  -----------------------------------------------------------------------------
+  Revision History
+  ================
+  10 Feb 2020 MDS Downloaded from https://github.com/Apthox/Javascript-Terminal
+  07 Sep 2020 MDS Added commands file, AES encryption file  
+  22 Feb 2022 MDS Added IndexedDB file system wrapper
+  -----------------------------------------------------------------------------
+  -->
+<html>
+	<head>
+		<link rel="stylesheet" href="css/terminal.css">
+		<link rel="stylesheet" href="css/dhtmlwindow.css">
+    <!-- Scripts must be placed at the end of the BODY for this page to work 
+      -->
+	</head>
+	<body>
+		<div id="screen">
+			<div id="Container">
+				<div id="input">
+					<p id="input_title"></p>
+					<input id="input_source" type="command" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
+				</div>
+				<div id="logger">
+					<div id="wrapper">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="statusBarContainer">
+		  <span id="statusBarLeft"></span>
+		  <span id="statusBarCentre"></span>
+		  <span id="statusBarRight"></span>
+		</div>
+		
+    <script src="js/terminal.js"></script>
+    <!-- The following are additions / modifications by Michael Scott 
+         These must be placed here for the scripts to work 
+         Commands.js must be the first file so that the registerFile() function
+         used by the codeInfo command works correctly                        -->
+    <script src="js/commands.js"></script>
+    <script src="include/dhtmlwindow.js"></script>
+    <script src="js/utilities.js"></script>
+    <script src="js/aliases.js"></script>
+    <script src="include/aes.js"></script>
+    
+    <!-- The following are for the indexedDB filesystem implementation       -->      
+    <script src="include/client.idb.filesystem.js"></script>
+    <script src="include/client.filer.js"></script>
+    <script src="js/fileSystemWrapper.js"></script>
+		<!-- End of stuff for the polyfill indexedDB fileSystem -->    
+
+		<link rel="stylesheet" href="css/burglarAlarm.css">
+    <script src="js/burglarAlarm.js" defer></script>
+    
+    <script>
+      registerFile(6); 
+    </script>
+
+	</body>
+</html>
+<!-----------------------------------------------------------------------------
+//                               End of file
+// --------------------------------------------------------------------------->

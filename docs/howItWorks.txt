@@ -1,0 +1,28 @@
+How It Works - Notes Accompanying Terminal.html and associated files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IndexedDB File System 
+---------------------
+In order for the Chrome client to read and write files freely, the HTML5 
+indexedDB is used to hold a pseudo file system (since Chrome security will not 
+allow direct access to the native filesystem).  An API has been created as
+idb.filesystem.js-master by Eric Bidelman which is a polyfill set of routines
+which creates a virtual file system.  A demo has been created by Eric and is
+found under https://github.com/ebidel/idb.filesystem.js/.  The included 
+javascript files in this html file have been copied across into the Terminal src 
+directory and have been accessed through fileSystemWrapper.js to allow a 
+systemic way of accessing the API which can be simplified should the file system 
+ever be upgraded.
+  
+
+User / Password Encryption
+--------------------------
+When the user enters their username and password, the password is used as an
+encryption key to encrypt the username.  This encrypted name is compared to
+those stored in a table.  When an identical 'hash' is found, the data from that 
+record is used.  The user password is also used to encrypt a randomly 
+generated key, which when the correct record is found, is also decrypted using
+the password.  This key is subsequently used to decrypt the rest of the record.
+
+
+
