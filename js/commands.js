@@ -5,9 +5,7 @@
   Revision History
   ================
   11 Feb 2020 MDS  Original
-  07 Sep 2020 MDS  Added Aliases, other command functions
-  19 Feb 2022 MDS  Modified file system commands to be compatable with 
-  								 commissioned Indexed DB File System wrapper
+
 
   ------------------------------------------------------------------------------
  */
@@ -24,25 +22,8 @@ cmd['ABOUT'] = {
   keywords: 'about, ver, version',
   flag: ' ',
   fn: function(argc, argv){
-    blockLog(shellVersion.join('\n'));
-    blockLog('');
-    blockLog(shellHistory.join('\n'));
-    return;
-  }
-};
-//
-// ----------------------------------------------------------------------------
-// ALIASES
-//
-cmd['ALIASES'] = {
-  name:'aliases - show all of the command aliases',
-  synopsis:'aliases', 
-  description: '',
-  seeAlso: '',
-  keywords: '',
-  flag: '*',
-  fn: function(argc, argv){
-    blockLog('ALIASES not yet implemented');
+    blockLog(version);
+    blockLog(copyright.join('\n'));
     return;
   }
 };
@@ -375,7 +356,7 @@ cmd['CAT'] = {
   keywords: '',
   flag: ' ',
   fn: function(argc, argv) {
-    fsw.cat(argc, argv);
+    fileSystemWrapperCAT(argc, argv);
     return;
   }
 };
@@ -394,52 +375,7 @@ cmd['CD'] = {
     if (argc == 1) {
       cmd['PWD'].fn(argc, argv);
     } else {
-      cmd['CHDIR'].fn(argc, argv);
-    };
-    return;
-  }
-};
-// ----------------------------------------------------------------------------
-// CHAT
-//
-cmd['CHAT'] = {
-  name:
-    'chat ?ON || OFF? - Enable or disable the inbuilt chatbot',
-  synopsis:'CHAT Display chat status\nCHAT ON enable chatbot\nCHAT OFF Disable chatbot\n\n' +
-    'Extra parameters are ignored', 
-  description: 'The chatbot is a \'souped up\' version of the traditional ' +
-    'Eliza chatbot, and does not use the AIML language',
-  seeAlso: '',
-  keywords: '',
-  flag: 'x',
-  fn: function(argc, argv){
-    if (argc == 1) {
-      if (chatEnabled == true) {
-        blockLog('Chat is presently enabled');
-      } else {
-        blockLog('Chat is presently disabled');
-      }
-    } else {
-      if (argv[1].toUpperCase() == 'ON') {
-        if (chatEnabled == false) {
-          start();
-          chatEnabled = true;
-        } else {
-          blockLog('Chat is already enabled !');
-        }
-      } else {
-        if (argv[1].toUpperCase() == 'OFF') {
-          if (chatEnabled == false) {
-            blockLog('Chat is already disabled !');
-          } else {
-            chatEnabled = false;
-            blockLog('Chat disabled');
-          }
-        } else {
-          cmd['MAN'].fn(2, ['MAN', 'CHAT']);
-        }
-      }
-      cmd['CHDIR'].fn(argc, argv);
+      cmd['LS'].fn(argc, argv);
     };
     return;
   }
@@ -455,9 +391,9 @@ cmd['CHDIR'] = {
     'where <name> is the directory name to change to.',
   seeAlso: 'CAT, CP, LS, MKDIR, MV, PWD, REN, RM, IMPORT, EXPORT, EXPLORE',
   keywords: '',
-  flag: ' ',
+  flag: '*',
   fn: function(argc, argv) {
-    fsw.chdir(argc, argv);
+    fileSystemWrapperCHDIR(argc, argv);
     return;
   }
 };
@@ -570,33 +506,8 @@ cmd['CONVERT'] = {
   keywords: 'convert',
   flag: ' ',
   fn: function(argc, argv){
-    if (argc < 5) {
-      blockLog("CONVERT: Incorrect usage");
-      cmd['MAN'].fn(2, ['MAN','CONVERT'])
-      return;
-    }
-
     argv[0] = 'convert';
     openLink('https://www.google.com/search?q=' + argv.join('+'));   
-    return;
-  }
-};
-//
-// ----------------------------------------------------------------------------
-// COPY - Copy file or folder
-//
-cmd['COPY'] = {
-  name: 'copy - copy file or directory',
-  synopsis:'copy <src> ?dst?', 
-  description:   'copy will copy the source file (or source folder) to ?dst?, ' +
-    'where <src> is the directory or folder to copy, ?dst? is the ' +
-    'destination directory or folder to copy to.  If ?dst? is not ' + 
-    'specified, then a default name will be used',
-  seeAlso: 'CHDIR, CP, LS, MKDIR, MV, PWD, REN, RM, IMPORT, EXPORT, EXPLORE',
-  keywords: '',
-  flag: 'x',
-  fn: function(argc, argv) {
-    fsw.copy(argc, argv);
     return;
   }
 };
@@ -606,16 +517,16 @@ cmd['COPY'] = {
 //
 cmd['CP'] = {
   name: 'cp - copy file or directory',
-  synopsis:'cp <src> ?dst?', 
+  synopsis:'cp <src>\ncp <src> ?dst?', 
   description:   'cp will copy the source file (or source folder) to ?dst?, ' +
     'where <src> is the directory or folder to copy, ?dst? is the ' +
     'destination directory or folder to copy to.  If ?dst? is not ' + 
     'specified, then a default name will be used',
-  seeAlso: 'CHDIR, COPYLS, MKDIR, MV, PWD, REN, RM, IMPORT, EXPORT, EXPLORE',
+  seeAlso: 'CHDIR, LS, MKDIR, MV, PWD, REN, RM, IMPORT, EXPORT, EXPLORE',
   keywords: '',
-  flag: 'x',
+  flag: '*',
   fn: function(argc, argv) {
-    fsw.cp(argc, argv);
+    fileSystemWrapperCP(argc, argv);
     return;
   }
 };
@@ -629,61 +540,17 @@ cmd['DATE'] = {
 };
 //
 // ----------------------------------------------------------------------------
-// DECRYPT - AES decrypt text and display it on the screen
-//
-function decrypt(message = '', key = ''){
-    var code = CryptoJS.AES.decrypt(message, key);
-    var decryptedMessage = code.toString(CryptoJS.enc.Utf8);
-
-    return decryptedMessage;
-}
-
-cmd['DECRYPT'] = {
-  name:'decrypt <<I>cyphertext</I>> - AES decrypt <<I>cyphertext</I>> and display it on the screen',
-  synopsis:'decrypt <I><cyphertext> ?<cyphertext>? ... ?<cyphertext>? ?key?</I>.\n' +
-    'Decrypt cyphertext with key.  If key is not provided, a default key will be used\n' +
-    'Multiple cycphertexts are joined with spaces before decryption.', 
-  description: '',
-  seeAlso: 'DECRYPT',
-  keywords: '',
-  flag: ' ',
-  fn: function(argc, argv) {
-    if (argc < 2) {
-      blockLog("Please enter some text to decrypt !");
-      cmd['MAN'].fn(2, ['MAN','DECRYPT'])
-      return;
-    }
-    if (argc < 3) {
-      blockLog(decrypt(argv[1], 'Terminal'));
-    } else {
-      blockLog(decrypt(argv.slice(1, -1).join(' '), argv[argc-1]));
-    }
-  }
-};
-//
-// ----------------------------------------------------------------------------
 // DEFINE
 //
 cmd['DEFINE'] = {
   name:'define - use the Google search engine to define a phrase',
-  synopsis:'define <phrase>', 
+  synopsis:'', 
   description: '',
   seeAlso: '',
   keywords: '',
-  flag: ' ',
+  flag: '*',
   fn: function(argc, argv){
-    if (argc > 2) {
-      blockLog("DEFINE: Too many parameters.  Extra parameters ignored");
-    } else {
-      if (argc < 2) {
-        blockLog("DEFINE: Incorrect usage");
-        cmd['MAN'].fn(2, ['MAN','CONVERT'])
-        return;
-      }
-    }
-
-    argv[0] = 'define';
-    openLink('https://www.google.com/search?q=' + argv[0] + '+' + argv[1]);   
+    blockLog('DEFINE not yet implemented');
     return;
   }
 };
@@ -701,38 +568,8 @@ cmd['DIR'] = {
   keywords: '',
   flag: ' ',
   fn: function(argc, argv){
-    fsw.ls(argc, argv);
+    fileSystemWrapperLS(argc, argv);
     return;
-  }
-};
-//
-// ----------------------------------------------------------------------------
-// ENCRYPT - AES encrypt text and display it on the screen
-//
-function encrypt(message = '', key = ''){
-    var message = CryptoJS.AES.encrypt(message, key);
-    return message.toString();
-}
-
-cmd['ENCRYPT'] = {
-  name:'encrypt <<I>plaintext</I>> - AES encrypt <<I>plaintext</I>> and display it on the screen',
-  synopsis:'encrypt <I><plaintext> ?<plaintext>? ... ?<plaintext>? ?key?</I>\n' +
-    'Encrypt plaintext with key.  If key is not provided, a default key will be used', 
-  description: '',
-  seeAlso: 'DECRYPT',
-  keywords: '',
-  flag: ' ',
-  fn: function(argc, argv) {
-    if (argc < 2) {
-      blockLog("Please enter some text to encrypt !");
-      cmd['MAN'].fn(2, ['MAN','ENCRYPT'])
-      return;
-    }
-    if (argc < 3) {
-      blockLog(encrypt(argv[1], 'Terminal'));
-    } else {
-      blockLog(encrypt(argv.slice(1, -1).join(' '), argv[argc-1]));
-    }
   }
 };
 //
@@ -752,6 +589,7 @@ cmd['EXIT'] = {
     return;
   }
 };
+
 //
 // ----------------------------------------------------------------------------
 // EXPLORE - Opens an indexedDB file explorer GUI instance in a new tab
@@ -783,7 +621,7 @@ cmd['EXPORT'] = {
   keywords: '',
   flag: '*',
   fn: function(argc, argv) {
-    fsw.export(argc, argv);
+    fileSystemWrapperEXPORT(argc, argv);
     return;
   }
 };//
@@ -841,32 +679,17 @@ cmd['HOME'] = {
 //    indexedDB filesystem 
 //
 cmd['IMPORT'] = {
-  name: 'import',
-  synopsis:'', 
+  name: 'import - import a file into the browser filesystem',
+  synopsis:'import <name>', 
   description:
-    'Files are imported to the current working directory by dragging and ' +
-    ' dropping them from the native file explorer into the browser window',
+    'import <name> - import <name> into the current working ' + 
+    'directory, where <name> is the name of the file to import',
   seeAlso: 'EXPORT, EXPLORE',
   keywords: '',
-  flag: 'x',
+  flag: '*',
   fn: function(argc, argv) {
-    fsw.import(argc, argv);
+    fileSystemWrapperIMPORT(argc, argv);
     return;
-  }
-};
-//
-// ----------------------------------------------------------------------------
-// LICENSE
-//
-cmd['LICENSE'] = {
-  name:'license - show software license',
-  synopsis:'license', 
-  description: '',
-  seeAlso: '',
-  keywords: '',
-  flag: ' ',
-  fn: function(argc, argv) {
-    blockLog(shellLicense.join('\n'), 3);
   }
 };
 //
@@ -955,54 +778,6 @@ function logonFunction(argc, argv) {
   }
   userName = argv[1].charAt(0).toUpperCase() + argv[1].slice(1);
   blockLog('Hi ' + userName + ', welcome back.');
-
-  if (userName.toUpperCase() == 'MIKE') {
-    blockLog(
-        '<h2>Rules Of Life</h2>    ' +
-        '1. <b>Make peace with your past</b>\n' +
-        '    so it won\'t disturb your future\n' +
-        '2. <b>What other people think of you is none of your business</b>\n' +
-        '    How other people treat you is your business\n' + 
-        '3. <b>The only person in charge </b>\n' +
-        '    of your happy is you\n' +
-        '4. <b>Don\'t compare your life to others</b>\n' +
-        '    comparison is the thief of joy\n' +
-        '5. <b>Time heals almost everything</b>\n' +
-        '    give it time\n' +
-        '6. <b>STOP thinking so much</b>\n' +
-        '    it\'s alright not to know all the answers\n' +
-        '7. <b>Smile</b>\n' +
-        '    you don\'t own all the problems of the world\n' +
-        '8. <b>Don\'t take life too seriously</b>\n' +
-        '    none of us get out of this life alive\n', 2);
-    blockLog(
-        '<b>"That\'s interesting"\n' +
-        '"Let me get back to you"\n' +
-        '"How can I help"', 6);
-
-    blockLog('<h2>Who I Aspire To Be</h2>  ' +
-      '1. <b>Love & Tolerance Is My Code</b>\n' +
-      '    because this was the code of the wisest man I ever knew\n' +
-      '2. <b>Follow The Rules Of Life</b>\n' +
-      '    because they were written by a wiser man than me, and they work\n' +
-      '3. <b>Be Understated</b>\n' +
-      '    because it is not important what other ' +
-          'people think of you; it is only important ' +
-          'what you think of yourself\n' +
-      '4. <b>Live and Die With Honour</b>\n' +
-      '    because it\'s about how you live and how' +
-          'you die - it\'s not about when you die\n' +
-      '5. <b>Fight It All The Way</b>\n' +
-      '    because anything else would be to give in, ' +
-          'which is wrong. But when the time has ' +
-          'come, the time has come\n' +
-      '6. <b>0x2152</b>\n');
-    blockLog(
-      '<b>"Be who you are and say what you think\n' +
-      'because those that matter don\'t mind,\n' +
-      'and those that mind don\'t matter"</b>\n', 6);
-  }
-
   timeFunction();
   document.getElementById("input_title").innerText = getPrompt();
 /*
@@ -1067,7 +842,7 @@ cmd['LS'] = {
   keywords: '',
   flag: ' ',
   fn: function(argc, argv) {
-    fsw.ls(argc, argv);
+    fileSystemWrapperLS(argc, argv);
     return;
   }
 };
@@ -1081,8 +856,7 @@ function manFunction(argc, argv) {
     var outStr = "";
     var i = 0;
 
-    blockLog('These are the possible commands on this system for user \'' +
-      userName + '\':');
+    blockLog('These are the possible commands on this system:');
     Object.keys(cmd).forEach(function(key,index) {
         if (cmd[key].flag == undefined) {
           key = '?\xa0' + key;
@@ -1108,7 +882,7 @@ function manFunction(argc, argv) {
       tab + 'x - partially implemented\n\n' +
       'Type MAN <<I>command</I>> for more detailed information for a command');
     blockLog('Type TEMPLATES for help on MAN templates, scriptfile formats ' +
-      'and MARKDOWN commentry');
+      'and markdown commentry');
     return;
   }
 
@@ -1233,9 +1007,9 @@ cmd['MKDIR'] = {
     'where <name> is the new directory name',
   seeAlso: 'CHDIR, CAT, CP, LS, MV, PWD, REN, RM, IMPORT, EXPORT, EXPLORE',
   keywords: '',
-  flag: ' ',
+  flag: '*',
   fn: function(argc, argv) {
-    fsw.mkdir(argc, argv);
+    fileSystemWrapperMKDIR(argc, argv);
     return;
   }
 };
@@ -1245,14 +1019,14 @@ cmd['MKDIR'] = {
 //
 cmd['MV'] = {
   name:'mv - move (rename) a file or directory',
-  synopsis:'mv [options]<name> <newname>\n',
+  synopsis:'mv <name> <newname>', 
   description: 'mv <name> <newname> - move <name> to <newname> ' +
     'where <name> is a file or directory, and <newname> is a file or directory',
   seeAlso: 'CHDIR, CAT, CP, LS, MKDIR, PWD, RM, IMPORT, EXPORT, EXPLORE',
   keywords: '',
   flag: '*',
   fn: function(argc, argv) {
-    var result = fsw.mv(argc, argv);
+    var result = fileSystemWrapperMV(argc, argv);
     if (result.length > 0) {
       log(result);
     } else {
@@ -1296,7 +1070,7 @@ cmd['PWD'] = {
   keywords: '',
   flag: ' ',
   fn: function(argc, argv) {
-    log(fsw.pwd(argc, argv));
+    log(fileSystemWrapperPWD(argc, argv));
     return;
   }
 };
@@ -1305,16 +1079,15 @@ cmd['PWD'] = {
 //  - 
 //
 cmd['REN'] = {
-  name:'ren - rename a file',
-  synopsis:'ren [path]<name> <newname>', 
-  description: 'ren [path]<name> <newname> - renamee <name> to <newname> ' +
-    'where <name> is a file, and <newname> is a file.\n' +
-    'Note that you cannot specify a new drive or path for your destination file.',
+  name:'ren - rename a file or directory',
+  synopsis:'ren <name> <newname>', 
+  description: 'ren <name> <newname> - renamee <name> to <newname> ' +
+    'where <name> is a file or directory, and <newname> is a file or directory',
   seeAlso: 'CHDIR, CAT, CP, LS, MKDIR, MV, PWD, RM, IMPORT, EXPORT, EXPLORE',
   keywords: '',
   flag: '*',
   fn: function(argc, argv) {
-    fsw.ren(argc, argv);
+    fileSystemWrapperREN(argc, argv);
     return;
   }
 };
@@ -1328,25 +1101,9 @@ cmd['RM'] = {
   description: 'removes <name> where <name> is a file or directory',
   seeAlso: 'CHDIR, CAT, CP, LS, MKDIR, MV, PWD, REN, IMPORT, EXPORT, EXPLORE',
   keywords: '',
-  flag: 'x',
-  fn: function(argc, argv) {
-    fsw.rm(argc, argv);
-    return;
-  }
-};
-//
-// ----------------------------------------------------------------------------
-// ALIASES
-//
-cmd['SHOW'] = {
-  name:'show - show various thingies',
-  synopsis:'show ?stuff?', 
-  description: '',
-  seeAlso: '',
-  keywords: '',
   flag: '*',
-  fn: function(argc, argv){
-    blockLog('SHOW not yet implemented');
+  fn: function(argc, argv) {
+    fileSystemWrapperRM(argc, argv);
     return;
   }
 };
@@ -1365,7 +1122,7 @@ cmd['SLEEPYBYES'] = {
   keywords: 'sleepybyes',
   flag: ' ',
   fn: function(argc, argv){
-    if ((userName.toUpperCase() != 'MIKE') && (userName.toUpperCase() != 'GEORGIA')) {
+    if ((userName != 'Mike') && (userName != 'Georgia')) {
         blockLog('You must be logged in as Mike or Georgia to use this function');
         return;
     }
@@ -1590,7 +1347,7 @@ function timeFunction(argc, argv) {
   d = new Date(d);
 
   if (userName != 'Mike') {
-    if (d.getTime() !== dSyd.getTime()) {
+    if (d !== dSyd) {
       blockLog('It\'s ' + getTimeString(d) + ' (' + getTimeString(dSyd) + 
         ' in Sydney).');
     } else {
@@ -1599,7 +1356,7 @@ function timeFunction(argc, argv) {
     return;
   }
   
-  if (d.getTime() != dSyd.getTime()) blockLog('It\'s ' + getTimeString(dSyd) + ' in Sydney.');
+  if (d !== dSyd) blockLog('It\'s ' + getTimeString(dSyd) + ' in Sydney.');
 
   var hour = d.getHours();
   var dow = d.getDay();
@@ -1652,19 +1409,14 @@ function timeFunction(argc, argv) {
                       strOut = "It's " + tod + " " + userName + 
                         ". You should be eating tea !";
                   } else {
-                    if (hour < 22) {
-                      strOut = "It's " + tod + " " + userName + 
-                        ". Good to see you here.";
+                    if (hour == 22) {
+                        // Just about time for bed
+                        strOut = "It's " + tod + " " + userName + 
+                          ". Almost time for bed,";
                     } else {
-                      if (hour == 22) {
-                          // Just about time for bed
-                          strOut = "It's " + tod + " " + userName + 
-                            ". Almost time for bed.";
-                      } else {
-                        // Night time
-                        strOut = "It's " + tod + " in the evening " + userName + 
-                          ".  You should be thinking about going to bed.";
-                      }
+                      // Night time
+                      strOut = "It's " + tod + " in the evening " + userName + 
+                        ".  You should be thinking about going to bed.";
                     }
                   }
                 }
@@ -1707,23 +1459,16 @@ cmd['TODO'] = {
     blockLog(
       'homeAutomation, OS, ping, whatIs, where (whereIs), wiki', 3);
     blockLog('Other stuff:',2);
-    blockLog(shellTodo.join('\n'), 3);
-  }
-};
-//
-// ----------------------------------------------------------------------------
-//  - 
-//
-cmd['TOUCH'] = {
-  name:'touch - create a file (or change the modified time to now if it exists',
-  synopsis:'', 
-  description: '',
-  seeAlso: 'CHDIR, CAT, CP, LS, MKDIR, MV, REN, RM, IMPORT, EXPORT, EXPLORE',
-  keywords: '',
-  flag: ' ',
-  fn: function(argc, argv) {
-    fsw.touch(argc, argv);
-    return;
+    blockLog(
+      '1. Add a house plan DHTML popup\n' +
+      '2. Implement command security in submitCommand() (by default ' +
+        'if no security flag is defined for the command, then it can be ' +
+        'executed ie. implement security retrospectively).  This allows ' +
+        'coding of chmod() and similar.\n' +
+      '3. indexedDB file system, complete with file commands.\n' +
+      '4. IMPORT and EXPORT to move files to native file system.\n' +
+      '5. Implement indexedDB file system on BasicA to ' + 
+        'load a BASIC program in from sandbox filesystem\n\n',3);
   }
 };
 //
@@ -1749,8 +1494,8 @@ cmd['TRANSLATE'] = {
   name:
     'translate - use the Google search engine to translate from one ' +
       'language to another',
-  synopsis:'translate\ntranslate <language> to <language>', 
-  description:'',
+  synopsis:'translate', 
+  description: '\'to english\', \'from english\'',
   seeAlso: '',
   keywords: 'translate',
   flag: ' ',

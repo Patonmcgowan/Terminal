@@ -8,8 +8,7 @@
   Revision History
   ================
   10 Feb 2020 MDS Downloaded from https://github.com/Apthox/Javascript-Terminal
-  07 Sep 2020 MDS Added commands file, AES encryption file  
-  22 Feb 2022 MDS Added IndexedDB file system wrapper
+
   -----------------------------------------------------------------------------
   -->
 <html>
@@ -35,7 +34,7 @@
 
 		<div id="statusBarContainer">
 		  <span id="statusBarLeft"></span>
-		  <span id="statusBarCentre"></span>
+		  <span id="statusBarCentre""></span>
 		  <span id="statusBarRight"></span>
 		</div>
 		
@@ -45,23 +44,22 @@
          Commands.js must be the first file so that the registerFile() function
          used by the codeInfo command works correctly                        -->
     <script src="js/commands.js"></script>
-    <script src="include/dhtmlwindow.js"></script>
+    <script src="js/dhtmlwindow.js"></script>
     <script src="js/utilities.js"></script>
     <script src="js/aliases.js"></script>
-    <script src="include/aes.js"></script>
     
     <!-- The following are for the indexedDB filesystem implementation       -->      
-    <script src="include/client.idb.filesystem.js"></script>
-    <script src="include/client.filer.js"></script>
-    <script src="js/fileSystemWrapper.js"></script>
+    <script src="../idb.filesystem.js-master/src/idb.filesystem.js" defer></script>
+    <script src="js/filer.js" defer></script>
+    <script src="js/dnd.js" defer></script>
+    <script src="js/app.js" onload="openFS()" defer></script>
+    <script src="js/fileSystemWrapper.js" defer></script>
 		<!-- End of stuff for the polyfill indexedDB fileSystem -->    
 
 		<link rel="stylesheet" href="css/burglarAlarm.css">
     <script src="js/burglarAlarm.js" defer></script>
     
-    <script>
-      registerFile(6); 
-    </script>
+    <script>registerFile(6); </script>
 
 	</body>
 </html>

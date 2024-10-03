@@ -8,8 +8,6 @@
   11 Feb 2020 MDS Added revision history and beautifying.  Changed to object 
                   based, modified logging functions to smart indent/wordwrap.
                   Added more capability in cmd object.
-  02 Mar 2022 MDS Added better compaction of command string white space in 
-                  smartSplit() in ```if (!emptySpace) {``` block
 
   ------------------------------------------------------------------------------
  */
@@ -49,53 +47,15 @@
 //      A one character flag displayed on the man page
 //        ' ' - Always displays this for aliases
 
+var version = 
+  'This version March 2020 by Michael Scott';
 
-var shellVersion = [
-  'Copyright &copy February 2022 by Michael Scott.  Please use the \"About\", \"License\" and \"Todo\" commands to see more info.',
-  'NOTE:',
-  '  Home PIR status display has been hidden in the code at the bottom of terminal.js until autoexec.bat has been implemented'
-];
-
-var shellHistory = [
-  'Refactored and added <a href=\"https://github.com/ebidel/idb.filesystem.js\">indexeddb virtual File Manager</a> by Eric Bidel 2022',
-  'Refactored and added <a href=\"https://github.com/Apthox/Javascript-Terminal\">Javascript terminal</a> by Apthox 2011',
-  'Translated from Myrtle IV shell client 2020',
-  'Refactored and added <a href=\"http://www.dynamicdrive.com/dynamicindex8/dhtmlwindow/index.htm\">DHTML Window</a> by Dynamic Drive 2012',
+var copyright = [
+  '<a href=\"https://github.com/Apthox/Javascript-Terminal\">Javascript terminal</a> by Apthox',
   'Translated from Myrtle III TCL/TK Command shell 2011',
+  'Translated from Myrtle IV shell client 2020',
   'Copyright &copy 1987 - 2006 Michael Scott Consulting Pty Ltd',
-  'Copyright &copy 2007 - 2022 Michael Scott'
-];
-
-var shellTodo = [
-  '1. EXPORT function to export whole filesystem',
-  '2. Finish indexedDB file system, complete with file commands.',
-  '   Drag and drop not always annunciating success',
-  '3. IMPORT function to move files from native file system (model off GUI drag and drop import).',
-  '4. Add Linux equivalent of autoexec.bat, config.sys - add registerCmd() function to programmatically add new commends. Add security to commands',
-  '5. Add dhtml popups for ToDo & License',
-  '6. Implement command security in submitCommand() (by default if no security flag is defined for the command, then it can be ',
-  '   executed ie. implement security retrospectively).  This allows coding of chmod() and similar.',
-  '   Note that if user does not have the required privileges, then the command should not be displayed on the man page.',
-  '7. Add \'Aliases\' or \'Show aliases\' command to show aliases.',
-  '8. Command fallthrough to chatbot if command is unknown',
-  '9. Integrate house plan DHTML popup with burglar alarm',
-  '10.Implement indexedDB file system on BasicA to load a BASIC program in from sandbox filesystem'
-];
-
-var shellLicense = [
-  'Copyright &copy 2022 - Michael Scott (patonmcgowan@gmail.com)',
-  '',
-  'Licensed under the Apache License, Version 2.0 (the "License");',
-  'you may not use this file except in compliance with the License.',
-  'You may obtain a copy of the License at',
-  '',
-  '   http://www.apache.org/licenses/LICENSE-2.0',
-  '',
-  'Unless required by applicable law or agreed to in writing, software',
-  'distributed under the License is distributed on an "AS IS" BASIS,',
-  'WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.',
-  'See the License for the specific language governing permissions and',
-  'limitations under the License.'
+  'Copyright &copy 2007 - 2020 Michael Scott'
 ];
 
 var cmd = [];
@@ -149,12 +109,10 @@ function smartSplit(input, del, emptySpace) {
   }
 
   if (!emptySpace) {
-    let i = 0;
-    while(i < outputs.length) {
-      while (outputs[i] === "") {
+    for (var i = 0; i < outputs.length; i++) {
+      if (outputs[i] === "") {
         outputs.splice(i, 1);
       }
-      i++;
     }
   }
   return outputs;
@@ -229,7 +187,7 @@ document.getElementById('input_source').addEventListener('keyup', submitCommand)
 // ----------------------------------------------------------------------------
 //
 function getPrompt() {
-  return userName + '@' + fsw.cwd + ': ';
+  return userName + '@' + fileSystemWrapperPWD() + ': ';
 }
 //
 // ----------------------------------------------------------------------------
@@ -326,23 +284,10 @@ function updateClockDisplay() {
 // ----------------------------------------------------------------------------
 //
 window.onload = function() {
-
-  // **************************************************************************
-  // **************************************************************************
-  // ** Hide the burglar alarm window for now                             // **
-  alarmStatus.hide();                                                     // **
-  // **                                                                   // **
-  // **************************************************************************
-  // **************************************************************************
-
   document.getElementById('wrapper').innerHTML += '<div class="log"><H1>Welcome to the Javascript Terminal</H1></div>';
   newBlock();
-  blockLog(shellVersion.join('\n'));
-  self.fsw = new FileSystemWrapper();
-  fsw.init('fileSystem',
-    function() { // Success callback
-      document.getElementById("input_title").innerText = userName + '@' + fsw.cwd + ': ';
-    });
+  cmd["ABOUT"].fn();
+  document.getElementById("input_title").innerText = userName + '@/: ';
   updateClockDisplay();
   setInterval(function(){ updateClockDisplay(); }, 1000);
   if (localStorage.getItem('cmdHist') != null) {
